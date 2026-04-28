@@ -1,0 +1,42 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Node / package managers
+**/node_modules/
+.pnpm-store/
+
+# Test / coverage
+coverage/
+.nyc_output/
+
+# Astro build outputs
+**/.astro/
+**/dist/
+
+# Hugo build outputs
+**/public/
+**/resources/_gen/
+**/.hugo_build.lock
+
+# Unified Pages output (root build script)
+.site/
+
+# Caches / temp
+.cache/
+.tmp/
+tmp/

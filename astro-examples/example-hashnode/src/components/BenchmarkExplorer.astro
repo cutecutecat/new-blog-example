@@ -1,0 +1,490 @@
+---
+const rows = [
+  { eval: 'Terminal-Bench 2.0', group: 'Coding', gpt55: 82.7, gpt54: 75.1, gpt55pro: null, gpt54pro: null, opus47: 69.4, gemini31pro: 68.5 },
+  { eval: 'Expert-SWE (Internal)', group: 'Coding', gpt55: 73.1, gpt54: 68.5, gpt55pro: null, gpt54pro: null, opus47: null, gemini31pro: null },
+  { eval: 'GDPval (wins or ties)', group: 'Knowledge', gpt55: 84.9, gpt54: 83.0, gpt55pro: 82.3, gpt54pro: 82.0, opus47: 80.3, gemini31pro: 67.3 },
+  { eval: 'OSWorld-Verified', group: 'Knowledge', gpt55: 78.7, gpt54: 75.0, gpt55pro: null, gpt54pro: null, opus47: 78.0, gemini31pro: null },
+  { eval: 'Toolathlon', group: 'Knowledge', gpt55: 55.6, gpt54: 54.6, gpt55pro: null, gpt54pro: null, opus47: null, gemini31pro: 48.8 },
+  { eval: 'BrowseComp', group: 'Knowledge', gpt55: 84.4, gpt54: 82.7, gpt55pro: 90.1, gpt54pro: 89.3, opus47: 79.3, gemini31pro: 85.9 },
+  { eval: 'FrontierMath Tier 1-3', group: 'Math', gpt55: 51.7, gpt54: 47.6, gpt55pro: 52.4, gpt54pro: 50.0, opus47: 43.8, gemini31pro: 36.9 },
+  { eval: 'FrontierMath Tier 4', group: 'Math', gpt55: 35.4, gpt54: 27.1, gpt55pro: 39.6, gpt54pro: 38.0, opus47: 22.9, gemini31pro: 16.7 },
+  { eval: 'CyberGym', group: 'Safety', gpt55: 81.8, gpt54: 79.0, gpt55pro: null, gpt54pro: null, opus47: 73.1, gemini31pro: null },
+];
+---
+
+<section class="bench-explorer" data-bench-root>
+  <div class="bench-controls">
+    <div class="control-group">
+      <label for="group-filter">Eval Group</label>
+      <select id="group-filter" data-group>
+        <option value="All">All</option>
+        <option value="Coding">Coding</option>
+        <option value="Knowledge">Knowledge</option>
+        <option value="Math">Math</option>
+        <option value="Safety">Safety</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label for="pair-filter">Model Pair</label>
+      <select id="pair-filter" data-pair>
+        <option value="gpt55:gpt54">GPT-5.5 vs GPT-5.4</option>
+        <option value="gpt55:opus47">GPT-5.5 vs Claude Opus 4.7</option>
+        <option value="gpt55:gemini31pro">GPT-5.5 vs Gemini 3.1 Pro</option>
+        <option value="gpt55pro:gpt54pro">GPT-5.5 Pro vs GPT-5.4 Pro</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-header">
+      <h4>Interactive comparison chart</h4>
+      <div class="legend" data-legend></div>
+    </div>
+    <p class="chart-subtitle">Scores on a fixed 0-100 axis.</p>
+    <div class="axis axis-100" aria-hidden="true">
+      <span style="--p: 0">0</span>
+      <span style="--p: 25">25</span>
+      <span style="--p: 50">50</span>
+      <span style="--p: 75">75</span>
+      <span style="--p: 100">100</span>
+    </div>
+    <div class="bars" data-bars></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-header">
+      <h4>Interactive delta chart</h4>
+      <p class="delta-help">First model minus second model (pts)</p>
+    </div>
+    <div class="axis axis-delta" data-delta-axis aria-hidden="true"></div>
+    <div class="delta-bars" data-delta></div>
+  </div>
+
+  <script type="application/json" data-source set:html={JSON.stringify(rows)}></script>
+</section>
+
+<script is:inline>
+  (() => {
+    document.querySelectorAll('[data-bench-root]').forEach((root) => {
+      const sourceEl = root.querySelector('[data-source]');
+      const rows = JSON.parse(sourceEl?.textContent || '[]');
+      const groupSelect = root.querySelector('[data-group]');
+      const pairSelect = root.querySelector('[data-pair]');
+      const barsEl = root.querySelector('[data-bars]');
+      const deltaEl = root.querySelector('[data-delta]');
+      const legendEl = root.querySelector('[data-legend]');
+      const deltaAxisEl = root.querySelector('[data-delta-axis]');
+
+      const labels = {
+        gpt55: 'GPT-5.5',
+        gpt54: 'GPT-5.4',
+        gpt55pro: 'GPT-5.5 Pro',
+        gpt54pro: 'GPT-5.4 Pro',
+        opus47: 'Claude Opus 4.7',
+        gemini31pro: 'Gemini 3.1 Pro',
+      };
+
+      const fmt = (n) => `${n.toFixed(1)}%`;
+      const fmtDelta = (n) => `${n >= 0 ? '+' : ''}${n.toFixed(1)} pts`;
+      const esc = (text) =>
+        String(text)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#39;');
+
+      const setLegend = (leftLabel, rightLabel) => {
+        legendEl.innerHTML = `
+          <span class="legend-item"><i class="dot left"></i>${esc(leftLabel)}</span>
+          <span class="legend-item"><i class="dot right"></i>${esc(rightLabel)}</span>
+        `;
+      };
+
+      const setDeltaAxis = (scale) => {
+        const ticks = [-scale, -scale / 2, 0, scale / 2, scale];
+        deltaAxisEl.innerHTML = ticks
+          .map((tick) => {
+            const p = ((tick + scale) / (2 * scale)) * 100;
+            const label = tick === 0 ? '0' : `${tick > 0 ? '+' : ''}${tick.toFixed(1)}`;
+            return `<span style="--p:${p.toFixed(2)}">${label}</span>`;
+          })
+          .join('');
+      };
+
+      const render = () => {
+        const selectedGroup = groupSelect.value;
+        const [leftKey, rightKey] = pairSelect.value.split(':');
+        const leftLabel = labels[leftKey];
+        const rightLabel = labels[rightKey];
+
+        const filtered = rows
+          .filter((row) => selectedGroup === 'All' || row.group === selectedGroup)
+          .filter((row) => Number.isFinite(row[leftKey]) && Number.isFinite(row[rightKey]))
+          .sort((a, b) => b[leftKey] - a[leftKey]);
+
+        barsEl.innerHTML = '';
+        deltaEl.innerHTML = '';
+        setLegend(leftLabel, rightLabel);
+
+        if (!filtered.length) {
+          barsEl.innerHTML = '<p class="empty">No comparable evals for this pair in the selected group.</p>';
+          deltaEl.innerHTML = '<p class="empty">No delta data to display.</p>';
+          setDeltaAxis(10);
+          return;
+        }
+
+        const deltas = filtered.map((row) => +(row[leftKey] - row[rightKey]).toFixed(1));
+        const deltaScale = Math.max(10, ...deltas.map((n) => Math.abs(n)));
+        setDeltaAxis(deltaScale);
+
+        filtered.forEach((row, idx) => {
+          const left = row[leftKey];
+          const right = row[rightKey];
+          const delta = +(left - right).toFixed(1);
+          const deltaWidth = (Math.abs(delta) / deltaScale) * 50;
+          const start = delta >= 0 ? 50 : 50 - deltaWidth;
+
+          const item = document.createElement('div');
+          item.className = 'bar-item';
+          item.style.setProperty('--i', String(idx));
+          item.innerHTML = `
+            <div class="bar-head">
+              <span class="eval-name">${esc(row.eval)}</span>
+              <span class="score-group">${esc(leftLabel)} ${fmt(left)} · ${esc(rightLabel)} ${fmt(right)}</span>
+            </div>
+            <div class="lane">
+              <div class="grid" aria-hidden="true">
+                <span style="--p:0"></span>
+                <span style="--p:25"></span>
+                <span style="--p:50"></span>
+                <span style="--p:75"></span>
+                <span style="--p:100"></span>
+              </div>
+              <div class="bar pair-left" style="--w:${left.toFixed(2)}%"></div>
+              <div class="bar pair-right" style="--w:${right.toFixed(2)}%"></div>
+            </div>
+          `;
+          barsEl.appendChild(item);
+
+          const deltaItem = document.createElement('div');
+          deltaItem.className = 'delta-item';
+          deltaItem.style.setProperty('--i', String(idx));
+          deltaItem.innerHTML = `
+            <div class="delta-row">
+              <span class="eval-name">${esc(row.eval)}</span>
+              <span class="delta-value ${delta >= 0 ? 'pos' : 'neg'}">${fmtDelta(delta)}</span>
+            </div>
+            <div class="delta-lane">
+              <div class="grid" aria-hidden="true">
+                <span style="--p:0"></span>
+                <span style="--p:25"></span>
+                <span style="--p:50"></span>
+                <span style="--p:75"></span>
+                <span style="--p:100"></span>
+              </div>
+              <div class="zero-line" aria-hidden="true"></div>
+              <div class="delta-bar ${delta >= 0 ? 'pos' : 'neg'}" style="--start:${start.toFixed(2)}%; --w:${deltaWidth.toFixed(2)}%"></div>
+            </div>
+          `;
+          deltaEl.appendChild(deltaItem);
+        });
+      };
+
+      groupSelect.addEventListener('change', render);
+      pairSelect.addEventListener('change', render);
+      render();
+    });
+  })();
+</script>
+
+<style>
+  .bench-explorer {
+    margin: 1.2rem 0 1.7rem;
+    border-radius: 16px;
+    border: 1px solid color-mix(in oklab, var(--line) 84%, transparent);
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--bg) 94%, #f8fafc 6%) 0%,
+      color-mix(in oklab, var(--bg) 98%, #f8fafc 2%) 100%
+    );
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 14px 40px rgba(15, 23, 42, 0.05);
+    padding: 1rem;
+  }
+
+  .bench-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .control-group label {
+    display: block;
+    margin-bottom: 0.34rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .control-group select {
+    width: 100%;
+    border: 1px solid color-mix(in oklab, var(--line) 84%, transparent);
+    background: color-mix(in oklab, var(--bg) 96%, white 4%);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 0.46rem 0.58rem;
+    font: inherit;
+    font-size: 0.92rem;
+  }
+
+  .chart-card {
+    border: 1px solid color-mix(in oklab, var(--line) 86%, transparent);
+    border-radius: 12px;
+    background: color-mix(in oklab, var(--bg) 97%, white 3%);
+    padding: 0.85rem;
+  }
+
+  .chart-card + .chart-card {
+    margin-top: 0.9rem;
+  }
+
+  .chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .chart-card h4 {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
+  .chart-subtitle,
+  .delta-help {
+    margin: 0;
+    font-size: 0.79rem;
+    color: var(--muted);
+  }
+
+  .legend {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.46rem;
+  }
+
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.32rem;
+    font-size: 0.74rem;
+    color: var(--muted);
+    border: 1px solid color-mix(in oklab, var(--line) 82%, transparent);
+    border-radius: 999px;
+    padding: 0.16rem 0.46rem;
+    background: color-mix(in oklab, var(--bg) 94%, #f8fafc 6%);
+  }
+
+  .dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    display: inline-block;
+  }
+
+  .dot.left {
+    background: #10a37f;
+  }
+
+  .dot.right {
+    background: #3b82f6;
+  }
+
+  .axis {
+    position: relative;
+    height: 1rem;
+    margin: 0.3rem 0 0.6rem;
+  }
+
+  .axis span {
+    position: absolute;
+    left: var(--p);
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .axis span::before {
+    content: '';
+    position: absolute;
+    top: -0.4rem;
+    left: 50%;
+    width: 1px;
+    height: 0.32rem;
+    transform: translateX(-50%);
+    background: color-mix(in oklab, var(--line) 88%, transparent);
+  }
+
+  .bar-item,
+  .delta-item {
+    margin-bottom: 0.62rem;
+    animation: fade-in 0.35s ease both;
+    animation-delay: calc(var(--i) * 20ms);
+  }
+
+  .bar-head,
+  .delta-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.55rem;
+    margin-bottom: 0.3rem;
+    align-items: baseline;
+  }
+
+  .eval-name {
+    font-size: 0.84rem;
+    font-weight: 600;
+  }
+
+  .score-group,
+  .delta-value {
+    font-size: 0.76rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .lane,
+  .delta-lane {
+    position: relative;
+    border-radius: 10px;
+    padding: 0.24rem 0;
+    overflow: hidden;
+    background: color-mix(in oklab, var(--bg) 86%, #e2e8f0 14%);
+    border: 1px solid color-mix(in oklab, var(--line) 82%, transparent);
+  }
+
+  .grid span {
+    position: absolute;
+    inset: 0 auto 0 var(--p);
+    width: 1px;
+    background: color-mix(in oklab, var(--line) 78%, transparent);
+    opacity: 0.65;
+  }
+
+  .bar {
+    position: relative;
+    height: 6px;
+    width: 0;
+    border-radius: 999px;
+    margin: 0.18rem 0.28rem;
+    animation: grow 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: calc(var(--i) * 35ms + 40ms);
+  }
+
+  .bar.pair-left {
+    background: linear-gradient(90deg, #17c28f 0%, #10a37f 100%);
+    box-shadow: 0 0 0 1px rgba(16, 163, 127, 0.25) inset;
+  }
+
+  .bar.pair-right {
+    background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 100%);
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.25) inset;
+  }
+
+  .bar.pair-left {
+    --target: var(--w);
+  }
+
+  .bar.pair-right {
+    --target: var(--w);
+  }
+
+  .delta-lane {
+    height: 16px;
+    padding: 0;
+  }
+
+  .zero-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 1px;
+    height: 100%;
+    background: color-mix(in oklab, var(--line) 60%, #111827 40%);
+  }
+
+  .delta-bar {
+    position: absolute;
+    top: 3px;
+    left: var(--start);
+    width: 0;
+    height: 10px;
+    border-radius: 999px;
+    animation: grow 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: calc(var(--i) * 35ms + 50ms);
+    --target: var(--w);
+  }
+
+  .delta-bar.pos {
+    background: linear-gradient(90deg, #34d399 0%, #10b981 100%);
+  }
+
+  .delta-bar.neg {
+    background: linear-gradient(90deg, #fca5a5 0%, #ef4444 100%);
+  }
+
+  .delta-value.pos {
+    color: #059669;
+  }
+
+  .delta-value.neg {
+    color: #dc2626;
+  }
+
+  .empty {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.83rem;
+    padding: 0.2rem 0;
+  }
+
+  @keyframes grow {
+    from {
+      width: 0;
+    }
+    to {
+      width: var(--target);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(3px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 720px) {
+    .bench-controls {
+      grid-template-columns: 1fr;
+    }
+
+    .chart-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .score-group,
+    .delta-value {
+      white-space: normal;
+      text-align: right;
+    }
+  }
+</style>

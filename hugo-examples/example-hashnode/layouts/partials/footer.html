@@ -1,0 +1,29 @@
+<footer class="site-footer">
+	<div class="footer-shell">
+		<p>&copy; {{ now.Year }} WatchU Blog</p>
+		<div class="footer-right">
+			<nav class="footer-links" aria-label="Site links">
+				<a href="/sitemap.xml"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 3h6v6H3V3zm12 0h6v6h-6V3zM9 15h6v6H9v-6zM5 9v3h5v3h2v-3h5V9h2v5h-7v1h-2v-1H3V9h2z"/></svg><span>Sitemap</span></a>
+				<a href="/index.xml"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.2 17.8a1.8 1.8 0 110 3.6 1.8 1.8 0 010-3.6zM4 11.2v3a5.8 5.8 0 015.8 5.8h3A8.8 8.8 0 004 11.2zm0-6.2v3A12 12 0 0116 20h3C19 11.2 12.8 5 4 5z"/></svg><span>RSS</span></a>
+			</nav>
+			<p class="muted">Built with Hugo</p>
+		</div>
+	</div>
+</footer>
+<style>
+.site-footer { border-top: 1px solid var(--line); padding: 2rem 1rem 2.6rem; }
+.footer-shell { width: min(var(--page-max), calc(100% - 0.25rem)); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0; border: none; border-radius: 0; background: transparent; }
+.site-footer p { margin: 0; font-size: 0.95rem; color: var(--text); }
+.footer-right { display: flex; align-items: center; gap: 1.1rem; }
+.footer-links { display: flex; align-items: center; gap: 1.4rem; }
+.footer-links a { display: inline-flex; align-items: center; gap: 0.45rem; color: var(--muted); text-decoration: none; font-size: 1rem; line-height: 1; padding: 0; border-radius: 0; border: none; }
+.footer-links a svg { width: 1rem; height: 1rem; }
+.footer-links a span { font-size: 0.9rem; font-weight: 500; }
+.footer-links a:hover { color: var(--accent); background: transparent; }
+.site-footer .muted { color: var(--muted); font-size: 0.9rem; }
+@media (max-width: 720px) {
+	.footer-shell { gap: 0.75rem; align-items: flex-start; flex-direction: column; }
+	.footer-right { gap: 0.9rem; flex-wrap: wrap; }
+	.footer-links { gap: 1rem; }
+}
+</style>

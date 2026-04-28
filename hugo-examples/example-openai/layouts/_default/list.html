@@ -1,0 +1,17 @@
+{{ define "main" }}
+<main>
+	<section style="max-width:1080px;margin:0 auto;">
+		<h1>{{ .Title }}</h1>
+		<ul class="post-list" style="list-style:none;padding:0;margin-top:1.5rem;display:grid;gap:0.9rem;">
+			{{ range .Pages.ByDate.Reverse }}
+			<li>
+				<a class="post-link" style="display:block;padding:0.9rem;border:1px solid var(--line);border-radius:var(--radius);text-decoration:none;" href="{{ .RelPermalink }}">
+					<strong>{{ .Title }}</strong>
+					<p style="margin:0.35rem 0 0;color:var(--muted);">{{ .Date.Format "Jan 2, 2006" }}</p>
+				</a>
+			</li>
+			{{ end }}
+		</ul>
+	</section>
+</main>
+{{ end }}

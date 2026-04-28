@@ -1,0 +1,17 @@
+baseURL = "https://example.com/"
+languageCode = "en-us"
+title = "WatchU Blog"
+summaryLength = 20
+
+disableKinds = ["taxonomy", "term"]
+
+[params]
+  description = "OpenAI-inspired blog theme built with Hugo."
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
+[outputs]
+  home = ["HTML", "RSS"]

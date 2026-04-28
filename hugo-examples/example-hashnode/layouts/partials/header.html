@@ -1,0 +1,241 @@
+{{- $pages := sort .Site.RegularPages "Date" "desc" -}}
+{{- $searchIndex := slice -}}
+{{- range $pages -}}
+	{{- $searchIndex = $searchIndex | append (dict
+		"title" .Title
+		"description" (.Params.description | default "")
+		"url" .RelPermalink
+		"pubDate" (.Date.Format "2006-01-02T15:04:05Z07:00")
+		"thumbnail" (.Params.heroImage | default "")) -}}
+{{- end -}}
+{{- $path := .RelPermalink -}}
+{{- $pageTitle := .Title -}}
+{{- if .IsHome -}}
+	{{- $pageTitle = "Latest Posts" -}}
+{{- else if eq $path "/group/" -}}
+	{{- $pageTitle = "Grouped Posts" -}}
+{{- else if eq $pageTitle "" -}}
+	{{- $pageTitle = "Article" -}}
+{{- end -}}
+<header class="site-header">
+	<div class="nav-shell">
+		<a class="brand-title" href="/">
+			<span class="site-name">{{ .Site.Title }}</span>
+			{{ if not .IsHome }}
+				<span aria-hidden="true">|</span>
+				<span class="page-title">{{ $pageTitle }}</span>
+			{{ end }}
+		</a>
+		<div class="actions">
+			<button type="button" class="icon-button" data-search-open aria-label="Search posts (Ctrl+K)">
+				<svg viewBox="0 0 24 24" aria-hidden="true">
+					<path d="M10.7 4a6.7 6.7 0 015.3 10.8l4.1 4.1a1 1 0 01-1.4 1.4l-4.1-4.1A6.7 6.7 0 1110.7 4zm0 2a4.7 4.7 0 100 9.4 4.7 4.7 0 000-9.4z" />
+				</svg>
+			</button>
+			<div class="theme-wrap">
+				<button type="button" class="icon-button" data-theme-toggle aria-haspopup="menu" aria-expanded="false" aria-label="Theme settings">
+					<span class="theme-symbol" data-theme-icon="light" aria-hidden="true">
+						<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5" /><path d="M12 2.5v2.6M12 18.9v2.6M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2.5 12h2.6M18.9 12h2.6M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" /></svg>
+					</span>
+					<span class="theme-symbol" data-theme-icon="dark" aria-hidden="true" hidden>
+						<svg viewBox="0 0 24 24"><path d="M14.6 3.2a8.8 8.8 0 1010.2 10.2 9.7 9.7 0 01-10.2-10.2z" transform="translate(-4.8 -1.6)" /></svg>
+					</span>
+				</button>
+				<div class="theme-menu" role="menu" data-theme-menu hidden>
+					<button type="button" role="menuitemradio" data-theme-value="light" aria-checked="false"><span class="option-with-icon"><span class="option-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5" /><path d="M12 2.5v2.6M12 18.9v2.6M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2.5 12h2.6M18.9 12h2.6M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" /></svg></span><span>Light</span></span><span class="checkmark">✓</span></button>
+					<button type="button" role="menuitemradio" data-theme-value="dark" aria-checked="false"><span class="option-with-icon"><span class="option-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14.6 3.2a8.8 8.8 0 1010.2 10.2 9.7 9.7 0 01-10.2-10.2z" transform="translate(-4.8 -1.6)" /></svg></span><span>Dark</span></span><span class="checkmark">✓</span></button>
+					<button type="button" role="menuitemradio" data-theme-value="system" aria-checked="false"><span class="option-with-icon"><span class="option-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="11" rx="1.5" ry="1.5" /><path d="M9 19h6M7 19h10" /></svg></span><span>System</span></span><span class="checkmark">✓</span></button>
+				</div>
+			</div>
+		</div>
+	</div>
+</header>
+<div class="search-overlay" data-search-overlay hidden>
+	<div class="search-panel" role="dialog" aria-modal="true" aria-label="Search posts">
+		<div class="search-head">
+			<svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.7 4a6.7 6.7 0 015.3 10.8l4.1 4.1a1 1 0 01-1.4 1.4l-4.1-4.1A6.7 6.7 0 1110.7 4zm0 2a4.7 4.7 0 100 9.4 4.7 4.7 0 000-9.4z" /></svg>
+			<input type="search" placeholder="Search posts" data-search-input autocomplete="off" spellcheck="false" />
+			<kbd>Ctrl + K</kbd>
+			<button type="button" class="close" data-search-close aria-label="Close search">×</button>
+		</div>
+		<ul class="search-results" data-search-results></ul>
+	</div>
+</div>
+<script id="search-index" type="application/json">{{ $searchIndex | jsonify }}</script>
+<script>
+const searchOverlay = document.querySelector('[data-search-overlay]');
+const searchOpen = document.querySelector('[data-search-open]');
+const searchClose = document.querySelector('[data-search-close]');
+const searchInput = document.querySelector('[data-search-input]');
+const searchResults = document.querySelector('[data-search-results]');
+const searchIndexNode = document.getElementById('search-index');
+const parseSearchItems = () => {
+	if (!searchIndexNode) return [];
+	try {
+		const parsed = JSON.parse(searchIndexNode.textContent || '[]');
+		return typeof parsed === 'string' ? JSON.parse(parsed) : parsed;
+	} catch (_) {
+		return [];
+	}
+};
+const searchItems = parseSearchItems();
+const themeToggle = document.querySelector('[data-theme-toggle]');
+const themeIcons = Array.from(document.querySelectorAll('[data-theme-icon]'));
+const themeMenu = document.querySelector('[data-theme-menu]');
+const themeOptions = Array.from(document.querySelectorAll('[data-theme-value]'));
+const renderResults = (query) => {
+	if (!searchResults) return;
+	const normalized = query.trim().toLowerCase();
+	searchResults.textContent = '';
+	if (!normalized) return;
+	const matches = searchItems.filter((item) => (`${item.title} ${item.description}`).toLowerCase().includes(normalized)).slice(0, 8);
+	if (matches.length === 0) {
+		const emptyItem = document.createElement('li');
+		emptyItem.className = 'empty';
+		emptyItem.textContent = 'No posts found.';
+		searchResults.appendChild(emptyItem);
+		return;
+	}
+	const sectionLabel = document.createElement('li');
+	sectionLabel.className = 'section-label';
+	sectionLabel.textContent = 'Search results';
+	searchResults.appendChild(sectionLabel);
+	const formatDate = (isoDate) => new Date(isoDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+	matches.forEach((item) => {
+		const li = document.createElement('li');
+		const link = document.createElement('a');
+		const title = document.createElement('span');
+		const meta = document.createElement('span');
+		const textWrap = document.createElement('span');
+		link.href = item.url;
+		link.className = 'result-link';
+		textWrap.className = 'text-wrap';
+		title.className = 'title';
+		meta.className = 'meta';
+		title.textContent = item.title;
+		meta.textContent = formatDate(item.pubDate);
+		textWrap.appendChild(title);
+		textWrap.appendChild(meta);
+		link.appendChild(textWrap);
+		if (item.thumbnail) {
+			const thumb = document.createElement('img');
+			thumb.className = 'thumb';
+			thumb.src = item.thumbnail;
+			thumb.alt = '';
+			thumb.loading = 'lazy';
+			link.appendChild(thumb);
+		}
+		li.appendChild(link);
+		searchResults.appendChild(li);
+	});
+};
+const openSearch = () => { if (!searchOverlay) return; searchOverlay.hidden = false; document.body.style.overflow = 'hidden'; if (searchInput) { searchInput.value = ''; renderResults(''); searchInput.focus(); } };
+const closeSearchPanel = () => { if (!searchOverlay) return; searchOverlay.hidden = true; document.body.style.overflow = ''; };
+const getTheme = () => document.documentElement.dataset.theme || 'system';
+const getResolvedTheme = () => document.documentElement.dataset.resolvedTheme === 'dark' ? 'dark' : 'light';
+const syncThemeToggle = () => {
+	const selected = getTheme();
+	const resolved = getResolvedTheme();
+	themeIcons.forEach((icon) => {
+		const iconTheme = icon.getAttribute('data-theme-icon');
+		icon.hidden = iconTheme !== resolved;
+	});
+	themeOptions.forEach((option) => {
+		const isActive = option.getAttribute('data-theme-value') === selected;
+		option.classList.toggle('active', isActive);
+		option.setAttribute('aria-checked', String(isActive));
+	});
+};
+const setTheme = (theme) => { if (window.__setTheme) window.__setTheme(theme); syncThemeToggle(); };
+searchOpen?.addEventListener('click', openSearch);
+searchClose?.addEventListener('click', closeSearchPanel);
+searchOverlay?.addEventListener('click', (event) => { if (event.target === searchOverlay) closeSearchPanel(); });
+searchInput?.addEventListener('input', (event) => renderResults(event.target.value));
+themeToggle?.addEventListener('click', () => {
+	if (!themeMenu) return;
+	const nextOpen = themeMenu.hidden;
+	themeMenu.hidden = !nextOpen;
+	themeToggle.setAttribute('aria-expanded', String(nextOpen));
+	syncThemeToggle();
+});
+themeOptions.forEach((option) => {
+	option.addEventListener('click', () => {
+		const value = option.getAttribute('data-theme-value');
+		if (!value) return;
+		setTheme(value);
+		themeMenu.hidden = true;
+		themeToggle?.setAttribute('aria-expanded', 'false');
+	});
+});
+document.addEventListener('click', (event) => {
+	if (!themeMenu || !themeToggle) return;
+	const target = event.target;
+	if (!(target instanceof Node)) return;
+	if (!themeMenu.contains(target) && !themeToggle.contains(target)) {
+		themeMenu.hidden = true;
+		themeToggle.setAttribute('aria-expanded', 'false');
+	}
+});
+document.addEventListener('keydown', (event) => {
+	if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+		event.preventDefault();
+		openSearch();
+	}
+	if (event.key === 'Escape') {
+		closeSearchPanel();
+		if (themeMenu) themeMenu.hidden = true;
+		themeToggle?.setAttribute('aria-expanded', 'false');
+	}
+});
+window.addEventListener('theme:changed', syncThemeToggle);
+syncThemeToggle();
+</script>
+<style>
+.site-header { position: sticky; top: 0; z-index: 30; padding: 0.75rem 1rem; background: color-mix(in srgb, var(--bg) 92%, transparent); border-bottom: 1px solid var(--line); backdrop-filter: blur(14px); }
+.nav-shell { width: min(var(--page-max), calc(100% - 0.25rem)); margin: 0 auto; display: flex; align-items: center; gap: 0.8rem; }
+.brand-title { display: flex; align-items: center; gap: 0.5rem; color: var(--text); text-decoration: none; white-space: nowrap; overflow: hidden; min-width: 0; }
+.site-name, .page-title { overflow: hidden; text-overflow: ellipsis; }
+.site-name { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; padding: 0; border: none; background: transparent; }
+.page-title { font-size: 0.95rem; color: var(--muted); font-weight: 500; }
+.actions { display: flex; align-items: center; gap: 0.45rem; margin-left: auto; }
+.icon-button { display: inline-flex; align-items: center; justify-content: center; width: 2.3rem; height: 2.3rem; border-radius: 10px; border: 1px solid var(--line); color: var(--muted); background: var(--surface); cursor: pointer; transition: border-color 140ms ease, color 140ms ease, transform 140ms ease; }
+.icon-button:hover { border-color: var(--accent); background: var(--surface-soft); color: var(--accent); transform: translateY(-1px); }
+.icon-button svg { width: 1.15rem; height: 1.15rem; fill: currentColor; }
+.theme-symbol { display: inline-flex; align-items: center; justify-content: center; width: 1.15rem; height: 1.15rem; }
+.theme-symbol svg, .option-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.theme-wrap { position: relative; }
+.theme-menu { position: absolute; right: 0; top: calc(100% + 0.45rem); width: 11.2rem; padding: 0.4rem; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); box-shadow: 0 10px 35px var(--shadow-color); }
+.theme-menu button { display: flex; width: 100%; align-items: center; justify-content: space-between; padding: 0.45rem 0.55rem; border: none; border-radius: 0.5rem; font: inherit; font-size: 0.94rem; color: var(--text); background: transparent; cursor: pointer; }
+.theme-menu button:hover, .theme-menu button.active { background: var(--accent-soft); }
+.theme-menu .checkmark { opacity: 0; font-size: 0.88rem; }
+.theme-menu button.active .checkmark { opacity: 1; }
+.theme-menu .option-with-icon { display: inline-flex; align-items: center; gap: 0.5rem; }
+.theme-menu .option-icon { display: inline-flex; align-items: center; justify-content: center; width: 1rem; height: 1rem; flex-shrink: 0; }
+.search-overlay { position: fixed; inset: 0; z-index: 40; padding: 4.6rem 1rem 1rem; background: color-mix(in srgb, #091228 42%, transparent); backdrop-filter: blur(5px); }
+.search-panel { width: min(760px, 100%); height: min(80vh, 640px); margin: 0 auto; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; box-shadow: 0 22px 48px var(--shadow-color); }
+.search-head { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 0.65rem; padding: 0.72rem 0.82rem; border-bottom: 1px solid var(--line); }
+.search-icon { width: 1.1rem; height: 1.1rem; fill: var(--muted); }
+.search-head input { border: 1px solid transparent; outline: none; background: transparent; font: inherit; font-size: 1rem; color: var(--text); padding: 0.28rem 0.45rem; border-radius: 8px; }
+.search-head input:focus { border-color: var(--line-strong); background: var(--surface-soft); }
+.search-head kbd { padding: 0.2rem 0.45rem; border: 1px solid var(--line); border-radius: 0.5rem; font-size: 0.75rem; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--surface); }
+.search-head .close { border: none; background: transparent; color: var(--muted); font-size: 1.45rem; line-height: 1; cursor: pointer; padding: 0; }
+.search-results { list-style: none; padding: 0.55rem 0.7rem 0.7rem; margin: 0; overflow-y: auto; height: calc(100% - 3.45rem); }
+.search-results li + li { margin-top: 0.25rem; }
+.search-results .section-label { margin: 0 0 0.2rem; padding: 0.45rem 0.1rem; font-size: 0.94rem; line-height: 1.25; color: var(--muted); font-weight: 700; }
+.search-results .result-link { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.55rem 0.1rem; border-radius: 0.7rem; text-decoration: none; color: inherit; }
+.search-results .result-link:hover { background: var(--surface-soft); }
+.search-results .text-wrap { display: flex; flex-direction: column; gap: 0.34rem; min-width: 0; }
+.search-results .title { font-size: 1.14rem; font-weight: 700; line-height: 1.32; color: var(--text); letter-spacing: -0.02em; }
+.search-results .meta { font-size: 0.78rem; color: var(--muted); line-height: 1.3; }
+.search-results .thumb { width: 120px; height: 72px; border-radius: 0.7rem; object-fit: cover; border: 1px solid var(--line); flex-shrink: 0; }
+.search-results .empty { display: flex; align-items: center; justify-content: center; height: 100%; min-height: 240px; color: var(--text); font-size: 1.08rem; font-weight: 600; }
+@media (max-width: 800px) {
+	.site-name { display: none; }
+	.nav-shell { gap: 0.6rem; }
+	.search-overlay { padding-top: 4.1rem; }
+	.search-panel { height: min(84vh, 700px); }
+	.search-results .title { font-size: 1.04rem; }
+	.search-results .meta { font-size: 0.82rem; }
+	.search-results .thumb { width: 92px; height: 58px; }
+}
+</style>

@@ -1,0 +1,11 @@
+[vectorchord]
+name = "TensorChord"
+github = "tensorchord"
+profileUrl = "https://github.com/tensorchord"
+avatarUrl = "https://github.com/tensorchord.png?size=48"
+
+[openai]
+name = "OpenAI"
+github = "openai"
+profileUrl = "https://github.com/openai"
+avatarUrl = "https://github.com/openai.png?size=48"

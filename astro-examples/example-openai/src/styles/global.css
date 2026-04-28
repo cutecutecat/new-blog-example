@@ -1,0 +1,230 @@
+:root {
+	--bg: #ffffff;
+	--surface: #ffffff;
+	--surface-soft: #f6f6f3;
+	--panel: #ffffff;
+	--text: #151515;
+	--muted: #626262;
+	--line: #e4e4dd;
+	--line-strong: #ccccbe;
+	--accent: #111111;
+	--radius: 18px;
+	--shadow-color: rgba(21, 21, 21, 0.12);
+	--shadow: 0 20px 45px rgba(21, 21, 21, 0.06);
+	--code-bg: #ecece5;
+	--code-text: #181818;
+	--page-max: 1440px;
+}
+
+:root[data-resolved-theme='dark'] {
+	--bg: #101110;
+	--surface: #141514;
+	--surface-soft: #1a1c1a;
+	--panel: #161816;
+	--text: #f0f1ef;
+	--muted: #acb0ac;
+	--line: #2a2d2a;
+	--line-strong: #3a3f3a;
+	--accent: #f3f4f2;
+	--shadow-color: rgba(0, 0, 0, 0.4);
+	--shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+	--code-bg: #2a2d2a;
+	--code-text: #ecefea;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	font-family:
+		var(--font-atkinson), 'Avenir Next', 'Segoe UI', 'Helvetica Neue',
+		sans-serif;
+	margin: 0;
+	padding: 0;
+	text-align: left;
+	background:
+		var(--bg);
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	color: var(--text);
+	font-size: 18px;
+	line-height: 1.72;
+	transition: background-color 180ms ease, color 180ms ease;
+}
+
+main {
+	width: min(var(--page-max), calc(100% - 2.5rem));
+	max-width: calc(100% - 2em);
+	margin: auto;
+	padding: 3.5rem 0 4.5rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0 0 0.5rem 0;
+	color: var(--text);
+	line-height: 1.18;
+	letter-spacing: -0.015em;
+}
+
+h1 {
+	font-size: clamp(2.25rem, 4vw, 3.4rem);
+}
+
+h2 {
+	font-size: clamp(1.65rem, 3vw, 2.25rem);
+}
+
+h3 {
+	font-size: clamp(1.35rem, 2.2vw, 1.7rem);
+}
+
+h4 {
+	font-size: 1.28rem;
+}
+
+h5 {
+	font-size: 1.1rem;
+}
+
+strong,
+b {
+	font-weight: 700;
+}
+
+a {
+	color: var(--accent);
+	text-decoration: underline;
+	text-decoration-color: var(--line-strong);
+	text-underline-offset: 0.18em;
+	transition: text-decoration-color 160ms ease;
+}
+
+a:hover {
+	text-decoration-color: var(--text);
+}
+
+p {
+	margin-bottom: 1em;
+	color: var(--text);
+}
+
+.prose p {
+	margin-bottom: 1.35em;
+}
+
+textarea {
+	width: 100%;
+	font-size: 16px;
+}
+input {
+	font-size: 16px;
+}
+table {
+	width: 100%;
+	border-collapse: collapse;
+	border: none;
+	background: transparent;
+}
+
+th,
+td {
+	padding: 1rem 0.9rem;
+	border: none;
+	border-bottom: 1px solid var(--line);
+	vertical-align: middle;
+	font-size: 0.96rem;
+}
+
+th {
+	font-weight: 600;
+	text-align: left;
+	white-space: nowrap;
+}
+
+th:first-child,
+td:first-child {
+	text-align: left !important;
+}
+
+th:not(:first-child),
+td:not(:first-child) {
+	text-align: left !important;
+	font-variant-numeric: tabular-nums;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 14px;
+	border: 1px solid var(--line);
+}
+
+code {
+	padding: 0.08rem 0.35rem;
+	background-color: var(--code-bg);
+	color: var(--code-text);
+	border-radius: 6px;
+	font-size: 0.9em;
+}
+
+pre {
+	padding: 1.05rem;
+	border-radius: 14px;
+	background: #111111;
+	color: #f5f5f5;
+	overflow-x: auto;
+}
+
+pre > code {
+	all: unset;
+}
+
+blockquote {
+	border-left: 2px solid var(--line-strong);
+	padding: 0.25rem 0 0.25rem 1.2rem;
+	margin: 1.5rem 0;
+	color: var(--muted);
+	font-size: 1.08em;
+}
+
+hr {
+	border: none;
+	border-top: 1px solid var(--line);
+	margin: 2rem 0;
+}
+
+@media (max-width: 720px) {
+	body {
+		font-size: 16px;
+	}
+	main {
+		width: calc(100% - 1.5rem);
+		padding: 2rem 0 3rem;
+	}
+}
+
+.sr-only {
+	border: 0;
+	padding: 0;
+	margin: 0;
+	position: absolute !important;
+	height: 1px;
+	width: 1px;
+	overflow: hidden;
+	/* IE6, IE7 - a 0 height clip, off to the bottom right of the visible 1px box */
+	clip: rect(1px 1px 1px 1px);
+	/* maybe deprecated but we need to support legacy browsers */
+	clip: rect(1px, 1px, 1px, 1px);
+	/* modern browsers, clip-path works inwards from each corner */
+	clip-path: inset(50%);
+	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
+	white-space: nowrap;
+}

@@ -1,0 +1,287 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+import { getAuthor } from '../data/authors';
+import { formatReadTime } from '../utils/readingTime';
+
+type Props = CollectionEntry<'blog'>['data'] & {
+	readingTimeMinutes: number;
+};
+
+const { title, description, author, pubDate, updatedDate, heroImage, readingTimeMinutes } = Astro.props;
+const authorProfile = getAuthor(author);
+---
+
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+		<style>
+			main {
+				width: min(var(--page-max), calc(100% - 2rem));
+			}
+			.hero-image {
+				width: min(980px, 100%);
+				margin-inline: auto;
+				margin-bottom: 1.3rem;
+			}
+			.hero-image img {
+				display: block;
+				width: 100%;
+				aspect-ratio: 16 / 8;
+				object-fit: cover;
+				border-radius: 14px;
+			}
+			.prose {
+				width: min(980px, 100%);
+				margin: auto;
+				padding: 1.15rem 1.35rem 1.35rem;
+				border: 1px solid var(--line);
+				border-radius: 14px;
+				background: var(--surface);
+				box-shadow: var(--shadow);
+			}
+			.title {
+				margin-bottom: 1.25rem;
+				padding-bottom: 1rem;
+				border-bottom: 1px solid var(--line);
+			}
+			.title h1 {
+				margin: 0.35rem 0 0.8rem;
+				max-width: 28ch;
+			}
+			.date {
+				margin: 0;
+				color: var(--muted);
+				font-size: 0.86rem;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.7rem;
+				align-items: center;
+			}
+			.author {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.45rem;
+				color: inherit;
+				text-decoration: none;
+			}
+			.author:hover {
+				color: var(--accent);
+			}
+			.author-avatar {
+				width: 1.3rem;
+				height: 1.3rem;
+				border-radius: 999px;
+				flex-shrink: 0;
+				object-fit: cover;
+			}
+			.last-updated-on {
+				font-style: normal;
+			}
+			.description {
+				margin: 0;
+				color: var(--muted);
+				font-size: 0.98rem;
+			}
+			.prose :global(*) {
+				margin-top: 0;
+			}
+			.prose :global(p) {
+				margin-bottom: 1.2rem;
+			}
+			.prose :global(p + p) {
+				margin-top: -0.15rem;
+			}
+			.prose :global(h2) {
+				margin-top: 2.5rem;
+				margin-bottom: 1.05rem;
+				letter-spacing: -0.015em;
+			}
+			.prose :global(h3) {
+				margin-top: 2.2rem;
+				margin-bottom: 0.85rem;
+				letter-spacing: -0.018em;
+			}
+			.prose :global(h4) {
+				margin-top: 1.65rem;
+				margin-bottom: 0.7rem;
+			}
+			.prose :global(h5),
+			.prose :global(h6) {
+				margin-top: 1.3rem;
+				margin-bottom: 0.55rem;
+			}
+			.prose :global(ul),
+			.prose :global(ol) {
+				margin: 0.7rem 0 1.25rem;
+				padding-left: 1.35rem;
+			}
+			.prose :global(li) {
+				margin: 0.38rem 0;
+				padding-left: 0.15rem;
+			}
+			.prose :global(li > ul),
+			.prose :global(li > ol) {
+				margin-top: 0.42rem;
+				margin-bottom: 0.5rem;
+			}
+			.prose :global(blockquote),
+			.prose :global(pre),
+			.prose :global(table),
+			.prose :global(figure),
+			.prose :global(details) {
+				margin-top: 1.55rem;
+				margin-bottom: 1.55rem;
+			}
+			.prose :global(blockquote) {
+				background: var(--surface-soft);
+				border: 1px solid var(--line);
+				border-left: 3px solid var(--accent);
+				border-radius: 10px;
+				padding: 0.7rem 0.95rem;
+			}
+			.prose :global(pre) {
+				border: 1px solid color-mix(in srgb, var(--accent) 15%, var(--line));
+			}
+			.prose :global(hr) {
+				margin: 2.3rem 0;
+			}
+			.prose :global(table + p),
+			.prose :global(figure + p),
+			.prose :global(blockquote + p) {
+				margin-top: 1.1rem;
+			}
+			.prose :global(.wide-media) {
+				width: min(calc(var(--page-max) + 80px), calc(100vw - 2rem));
+				margin: 1.6rem 50%;
+				transform: translateX(-50%);
+			}
+			.prose :global(.wide-media img),
+			.prose :global(.wide-media table) {
+				width: 100%;
+			}
+			.prose :global(.wide-media table) {
+				display: table;
+				margin: 0;
+			}
+			.prose :global(.wide-table) {
+				width: min(calc(var(--page-max) + 80px), calc(100vw - 2rem));
+				margin: 1.6rem 50%;
+				transform: translateX(-50%);
+				overflow-x: auto;
+			}
+			.prose :global(.wide-table table) {
+				min-width: 800px;
+			}
+			.prose :global(.media-grid-2) {
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 1rem;
+				margin: 1.4rem 0;
+			}
+			.prose :global(.media-grid-2 img) {
+				width: 100%;
+				display: block;
+			}
+			.prose :global(.media-grid-2 figure) {
+				margin: 0;
+			}
+			.prose :global(.media-grid-2 figcaption) {
+				margin-top: 0.45rem;
+				font-size: 0.86rem;
+				color: var(--muted);
+			}
+			@media (max-width: 720px) {
+				main {
+					width: calc(100% - 1.5rem);
+				}
+				.hero-image {
+					margin-bottom: 1.2rem;
+				}
+				.prose {
+					padding: 0.95rem 0.95rem 1.1rem;
+				}
+				.prose :global(h2) {
+					margin-top: 2.25rem;
+					margin-bottom: 0.85rem;
+				}
+				.prose :global(h3) {
+					margin-top: 1.8rem;
+				}
+				.prose :global(blockquote),
+				.prose :global(pre),
+				.prose :global(table),
+				.prose :global(figure),
+				.prose :global(details) {
+					margin-top: 1.25rem;
+					margin-bottom: 1.25rem;
+				}
+				.prose :global(.wide-media),
+				.prose :global(.wide-table) {
+					width: 100%;
+					margin: 1.2rem 0;
+					transform: none;
+				}
+				.prose :global(.media-grid-2) {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<Header />
+		<main>
+			<article>
+				<div class="hero-image">
+					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
+				</div>
+				<div class="prose">
+					<div class="title">
+						<div class="date">
+							<a
+								class="author"
+								href={authorProfile.profileUrl}
+								target="_blank"
+								rel="noreferrer noopener"
+							>
+								<img
+									class="author-avatar"
+									src={authorProfile.avatarUrl}
+									alt=""
+									aria-hidden="true"
+									loading="lazy"
+									decoding="async"
+									referrerpolicy="no-referrer"
+								/>
+								<span>{authorProfile.name}</span>
+							</a>
+							<span aria-hidden="true">·</span>
+							<FormattedDate date={pubDate} />
+							<span aria-hidden="true">·</span>
+							<span>{formatReadTime(readingTimeMinutes)}</span>
+								{
+									updatedDate && (
+										<>
+											<span aria-hidden="true">·</span>
+											<span class="last-updated-on">
+												Last updated on <FormattedDate date={updatedDate} />
+											</span>
+										</>
+									)
+								}
+						</div>
+						<h1>{title}</h1>
+						<p class="description">{description}</p>
+					</div>
+					<slot />
+				</div>
+			</article>
+		</main>
+		<Footer />
+	</body>
+</html>

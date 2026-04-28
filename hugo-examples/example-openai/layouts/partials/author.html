@@ -1,0 +1,17 @@
+{{- $id := lower (trim (.id | default "") " ") -}}
+{{- $authors := hugo.Data.authors | default dict -}}
+{{- $safeID := cond (eq $id "") "unknown" $id -}}
+{{- $resolved := dict "id" $safeID "name" (.id | default "Unknown") "github" $safeID "profileUrl" (printf "https://github.com/%s" $safeID) "avatarUrl" (printf "https://github.com/%s.png?size=48" $safeID) -}}
+{{- with index $authors $id -}}
+  {{- $github := .github | default $id -}}
+  {{- $profileURL := .profileUrl | default (printf "https://github.com/%s" $github) -}}
+  {{- $avatarURL := .avatarUrl | default (printf "https://github.com/%s.png?size=48" $github) -}}
+  {{- $resolved = dict
+    "id" $id
+    "name" (.name | default $id)
+    "github" $github
+    "profileUrl" $profileURL
+    "avatarUrl" $avatarURL
+  -}}
+{{- end -}}
+{{- $resolved | jsonify -}}

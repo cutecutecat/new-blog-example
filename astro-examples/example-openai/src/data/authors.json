@@ -1,0 +1,10 @@
+{
+	"vectorchord": {
+		"name": "TensorChord",
+		"github": "tensorchord"
+	},
+	"openai": {
+		"name": "OpenAI",
+		"github": "openai"
+	}
+}

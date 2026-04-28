@@ -1,0 +1,9 @@
+{{- $id := lower (trim (.id | default "") " ") -}}
+{{- if eq $id "vectorchord" -}}
+  {{- return (dict "id" "vectorchord" "name" "TensorChord" "github" "tensorchord" "profileUrl" "https://github.com/tensorchord" "avatarUrl" "https://github.com/tensorchord.png?size=48") -}}
+{{- end -}}
+{{- if eq $id "openai" -}}
+  {{- return (dict "id" "openai" "name" "OpenAI" "github" "openai" "profileUrl" "https://github.com/openai" "avatarUrl" "https://github.com/openai.png?size=48") -}}
+{{- end -}}
+{{- $safeID := cond (eq $id "") "unknown" $id -}}
+{{- return (dict "id" $safeID "name" (.id | default "Unknown") "github" $safeID "profileUrl" (printf "https://github.com/%s" $safeID) "avatarUrl" (printf "https://github.com/%s.png?size=48" $safeID)) -}}

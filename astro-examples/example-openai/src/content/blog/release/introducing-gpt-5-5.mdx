@@ -1,0 +1,424 @@
+---
+title: "Introducing GPT-5.5"
+description: "A new class of intelligence for real work."
+author: "openai"
+pubDate: 2026-04-23
+heroImage: ../../../assets/covers/introducing-gpt-5-5.svg
+---
+import { Image } from 'astro:assets';
+import BenchmarkExplorer from '../../../components/BenchmarkExplorer.astro';
+import heroImage from '../../../assets/blog-placeholder-1.jpg';
+import img2 from '../../../assets/blog-placeholder-2.jpg';
+import img3 from '../../../assets/blog-placeholder-3.jpg';
+import img4 from '../../../assets/blog-placeholder-4.jpg';
+import img5 from '../../../assets/blog-placeholder-5.jpg';
+
+### Table of contents
+
+- [Model capabilities](#model-capabilities)
+- [Next-generation inference efficiency](#next-generation-inference-efficiency)
+- [Advancing cybersecurity for everyone's safety](#advancing-cybersecurity-for-everyones-safety)
+- [Availability and pricing](#availability-and-pricing)
+- [Evaluations](#evaluations)
+
+April 23, 2026  
+`Product` `Release`
+
+> **Update on April 24, 2026:** GPT-5.5 and GPT-5.5 Pro are now available in the API. [The system card](https://openai.com/index/gpt-5-5-system-card/) has also been updated to describe the additional safeguards that apply.
+
+---
+
+<div class="hero-wrap">
+  <Image src={heroImage} alt="GPT-5.5 visual" />
+  <div class="hero-overlay">
+    <p class="hero-title">GPT-5.5</p>
+    <p class="hero-sub">First Impressions</p>
+  </div>
+</div>
+
+We're releasing GPT-5.5, our smartest and most intuitive-to-use model yet, and the next step toward a new way of getting work done on a computer.
+
+GPT-5.5 understands intent faster and can carry more of the work itself. It excels at coding, researching online, analyzing data, creating documents and spreadsheets, operating software, and moving across tools until a task is complete.
+
+#### Capability summary
+
+- **Agentic coding:** Long-horizon planning, repo-level edits, debugging, and verification
+- **Computer use:** More stable execution in multi-step UI workflows
+- **Knowledge work:** Better synthesis for docs, slides, and spreadsheet-heavy tasks
+- **Scientific research:** Stronger iterative reasoning and evidence refinement
+
+## Model capabilities
+
+The gains are especially strong in agentic coding, computer use, knowledge work, and early scientific research. GPT-5.5 delivers this increase in intelligence without sacrificing practical latency.
+
+<div class="media-card dark">
+  <Image src={img2} alt="Coding workflow" />
+  <div>
+    <h3>Built for complete workflows</h3>
+    <p>GPT-5.5 can take ownership of larger subtasks, execute with fewer retries, and verify outputs before handoff.</p>
+    <ul>
+      <li>Higher pass rate on coding benchmarks</li>
+      <li>Improved tool-use reliability</li>
+      <li>Stronger edit consistency across long sessions</li>
+    </ul>
+  </div>
+</div>
+
+> "GPT-5.5 is noticeably smarter and more persistent than GPT-5.4, with stronger coding performance and more reliable tool use."
+>
+> Michael Truell, Co-founder & CEO at Cursor
+
+<div class="media-split">
+  <figure>
+    <Image src={img3} alt="Research preview" />
+    <figcaption>Computer-use and research loops become more stable over longer tasks.</figcaption>
+  </figure>
+  <figure>
+    <Image src={img4} alt="Document workflow" />
+    <figcaption>Knowledge workflows: drafting, revision, and finalization with fewer interventions.</figcaption>
+  </figure>
+</div>
+
+## Next-generation inference efficiency
+
+Model intelligence improves when training and inference are designed together. GPT-5.5 is trained and served on the same next-generation stack so it can deliver frontier capability at practical latency.
+
+| Eval | GPT-5.5 |
+| --- | --- |
+| Terminal-Bench 2.0 | **82.7%** |
+| Expert-SWE | **73.1%** |
+| GDPval (wins or ties) | **84.9%** |
+| OSWorld-Verified | **78.7%** |
+
+<div class="axis-chart" aria-label="Efficiency bars">
+  <div class="axis-labels"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></div>
+  <div class="row"><b>GPT-5.5</b><div class="track"><span style="width:82.7%"></span></div></div>
+  <div class="row"><b>GPT-5.4</b><div class="track"><span style="width:75.1%"></span></div></div>
+  <div class="row"><b>Claude Opus 4.7</b><div class="track"><span style="width:69.4%"></span></div></div>
+  <div class="row"><b>Gemini 3.1 Pro</b><div class="track"><span style="width:68.5%"></span></div></div>
+</div>
+
+## Advancing cybersecurity for everyone's safety
+
+GPT-5.5 improves defensive cybersecurity use cases while introducing stronger safeguards designed to reduce misuse. Deployment decisions were informed by advanced red teaming and targeted high-risk capability evaluations.
+
+<div class="media-card soft">
+  <div>
+    <h3>Safety deployment posture</h3>
+    <ul>
+      <li>Expanded internal and external red teaming</li>
+      <li>Policy and enforcement updates for high-risk requests</li>
+      <li>Preparedness checks across cyber and biology domains</li>
+    </ul>
+  </div>
+  <Image src={img5} alt="Safety workflow" />
+</div>
+
+<div class="line-svg">
+  <svg viewBox="0 0 800 220" role="img" aria-label="Reliability curve">
+    <defs>
+      <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#10a37f" />
+        <stop offset="100%" stop-color="#3b82f6" />
+      </linearGradient>
+    </defs>
+    <g stroke="#d3d8df" stroke-width="1">
+      <line x1="0" y1="40" x2="800" y2="40" />
+      <line x1="0" y1="90" x2="800" y2="90" />
+      <line x1="0" y1="140" x2="800" y2="140" />
+      <line x1="0" y1="190" x2="800" y2="190" />
+    </g>
+    <path d="M0,175 C120,160 200,145 280,132 C360,120 460,95 540,84 C620,73 700,60 800,44" fill="none" stroke="url(#g1)" stroke-width="6" stroke-linecap="round" />
+    <circle cx="800" cy="44" r="7" fill="#3b82f6" />
+  </svg>
+</div>
+
+## Availability and pricing
+
+At launch, GPT-5.5 rolled out first in ChatGPT and Codex tiers, then expanded to API access with additional safeguards.
+
+| Surface | Availability | Notes |
+| --- | --- | --- |
+| ChatGPT | Plus / Pro / Business / Enterprise | GPT-5.5 available, GPT-5.5 Pro by plan tier |
+| Codex | Paid tiers | Strong gains on implementation and long-running tasks |
+| API | Available with additional safeguards | See release updates and system card |
+
+## Evaluations
+
+The launch article includes benchmark comparisons across coding, computer use, and reasoning-heavy workloads.
+
+<BenchmarkExplorer />
+
+| Eval | GPT-5.5 | GPT-5.4 | GPT-5.5 Pro | GPT-5.4 Pro | Claude Opus 4.7 | Gemini 3.1 Pro |
+| --- | --- | --- | --- | --- | --- | --- |
+| Terminal-Bench 2.0 | **82.7%** | 75.1% | - | - | 69.4% | 68.5% |
+| Expert-SWE (Internal) | **73.1%** | 68.5% | - | - | - | - |
+| GDPval (wins or ties) | **84.9%** | 83.0% | 82.3% | 82.0% | 80.3% | 67.3% |
+| OSWorld-Verified | **78.7%** | 75.0% | - | - | 78.0% | - |
+| Toolathlon | **55.6%** | 54.6% | - | - | - | 48.8% |
+| BrowseComp | 84.4% | 82.7% | **90.1%** | 89.3% | 79.3% | 85.9% |
+| FrontierMath Tier 1-3 | 51.7% | 47.6% | **52.4%** | 50.0% | 43.8% | 36.9% |
+| FrontierMath Tier 4 | 35.4% | 27.1% | **39.6%** | 38.0% | 22.9% | 16.7% |
+| CyberGym | **81.8%** | 79.0% | - | - | 73.1% | - |
+
+<div class="visual-endcap">
+  <article class="tile t1"><h4>Capability index</h4><p>Global intelligence index by domain.</p></article>
+  <article class="tile t2"><h4>Tooling reliability</h4><p>Agent success in multi-step computer use tasks.</p></article>
+  <article class="tile t3"><h4>Safety envelope</h4><p>Deployment controls and safeguards.</p></article>
+</div>
+
+<div class="faq-shell">
+  <details>
+    <summary>Methodology notes</summary>
+    <p>Scores combine public benchmarks and internal evaluations measured on April 23, 2026. Results may vary by prompt, tool access, and task complexity.</p>
+  </details>
+  <details>
+    <summary>Sources</summary>
+    <p><a href="https://openai.com/index/introducing-gpt-5-5/">Introducing GPT-5.5</a> · <a href="https://openai.com/index/gpt-5-5-system-card/">GPT-5.5 System Card</a></p>
+  </details>
+</div>
+
+<style is:global>{String.raw`
+  .hero-wrap {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #d8deea;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-wrap img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.8rem 0.9rem;
+    color: white;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 10%, rgba(0, 0, 0, 0.58) 100%);
+  }
+
+  .hero-title {
+    margin: 0;
+    font-weight: 700;
+  }
+
+  .hero-sub {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+  }
+
+  .media-card {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 0.8rem;
+    border: 1px solid #d8deea;
+    border-radius: 12px;
+    margin: 1rem 0;
+    overflow: hidden;
+    background: white;
+  }
+
+  .media-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    min-height: 220px;
+  }
+
+  .media-card > div {
+    padding: 0.8rem 0.9rem;
+  }
+
+  .media-card.dark {
+    background: #0f172a;
+    color: #dbe7ff;
+    border-color: #1e293b;
+  }
+
+  .media-card.dark p,
+  .media-card.dark li {
+    color: #c0cbe2;
+  }
+
+  .media-card.soft {
+    grid-template-columns: 1fr 1.1fr;
+    background: linear-gradient(135deg, #faf5ff 0%, #eff6ff 100%);
+  }
+
+  .media-split {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 1.15rem;
+  }
+
+  .media-split figure {
+    margin: 0;
+    border: 1px solid #d8deea;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+  }
+
+  .media-split figcaption {
+    padding: 0.6rem 0.7rem;
+    margin: 0;
+    color: #606b85;
+    font-size: 0.8rem;
+  }
+
+  .axis-chart {
+    border: 1px solid #d8deea;
+    border-radius: 12px;
+    background: white;
+    padding: 0.7rem;
+    margin-top: 1rem;
+  }
+
+  .axis-chart .axis-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: #606b85;
+    margin-bottom: 0.4rem;
+  }
+
+  .axis-chart .row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0.65rem;
+    align-items: center;
+    margin: 0.34rem 0;
+  }
+
+  .axis-chart b {
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .axis-chart .track {
+    height: 8px;
+    border-radius: 999px;
+    background: #e9edf6;
+    overflow: hidden;
+  }
+
+  .axis-chart .track span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #10a37f, #3b82f6);
+  }
+
+  .line-svg {
+    margin-top: 1rem;
+    border: 1px solid #d8deea;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fbfdff;
+  }
+
+  .line-svg svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .visual-endcap {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+    margin-top: 1.2rem;
+  }
+
+  .tile {
+    border-radius: 12px;
+    padding: 0.75rem;
+    color: #0f172a;
+  }
+
+  .tile h4 {
+    margin: 0 0 0.3rem;
+    font-size: 0.9rem;
+  }
+
+  .tile p {
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+
+  .tile.t1 {
+    background: linear-gradient(135deg, #fde68a, #fbcfe8);
+  }
+
+  .tile.t2 {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  }
+
+  .tile.t3 {
+    background: linear-gradient(135deg, #c4b5fd, #93c5fd);
+  }
+
+  .faq-shell {
+    margin-top: 1.15rem;
+    border: 1px solid #d8deea;
+    border-radius: 12px;
+    background: #f8fafc;
+    padding: 0.65rem;
+  }
+
+  .faq-shell details {
+    border-radius: 8px;
+    background: white;
+    border: 1px solid #d8deea;
+    padding: 0.45rem 0.6rem;
+  }
+
+  .faq-shell details + details {
+    margin-top: 0.5rem;
+  }
+
+  .faq-shell summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .faq-shell p {
+    margin: 0.45rem 0 0;
+    font-size: 0.84rem;
+    color: #606b85;
+  }
+
+  @media (max-width: 900px) {
+    .axis-chart .row {
+      grid-template-columns: 1fr;
+      gap: 0.3rem;
+    }
+
+    .visual-endcap {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .media-split,
+    .media-card,
+    .media-card.soft {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-sub {
+      font-size: 1.18rem;
+    }
+  }
+`}</style>
